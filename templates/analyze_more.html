@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyze More - Candidate {{ candidate_id }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+.button-link { display:inline-block; padding:12px 25px; margin:5px; border-radius:8px; text-decoration:none; color:#fff; background:#00cec9; text-align:center; transition:background 0.2s ease;}
+.button-link:hover,.button-link:focus {background:#00b894; outline:2px solid #00cec9; outline-offset:2px;}
+.card { background: rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:20px; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Analyze More - Candidate {{ candidate_id }}</h1>
+</header>
+
+<section class="card" tabindex="0">
+    <h2>Full Extracted Text</h2>
+    <pre style="white-space: pre-wrap;">{{ resume.text }}</pre>
+</section>
+
+
+<section class="card">
+<h2>Predicted Role & Skills</h2>
+<p><strong>Predicted Role:</strong> {{ resume.predicted_role }} ({{ resume.pred_confidence }}%)</p>
+<p><strong>Skills:</strong> {{ resume.skills | join(', ') }}</p>
+<p><strong>Experience:</strong> {{ resume.experience_years }} years</p>
+<p><strong>Education:</strong> {{ resume.education | join(', ') }}</p>
+{% if match_score is not none %}
+<p><strong>ATS Match Score:</strong> {{ match_score }}%</p>
+{% endif %}
+</section>
+
+<section class="card" style="text-align:center;">
+    <a href="{{ url_for('index') }}" class="button-link" role="button" tabindex="0">Back Home</a>
+    <a href="{{ url_for('dashboard') }}" class="button-link" role="button" tabindex="0">Dashboard</a>
+    <a href="{{ url_for('analyze_more', candidate_id=candidate_id) }}" class="button-link" role="button" tabindex="0">Analyze More</a>
+</section>
+
+</div>
+</body>
+</html>

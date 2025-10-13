@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candidate {{ candidate_id }} Analysis</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+.button-link {
+    display: inline-block;
+    padding: 12px 25px;
+    margin: 5px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    background: #00cec9;
+    text-align: center;
+    transition: background 0.2s ease;
+}
+.button-link:hover,
+.button-link:focus {
+    background: #00b894;
+    outline: 2px solid #00cec9;
+    outline-offset: 2px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Candidate {{ candidate_id }} Analysis</h1>
+    </header>
+
+    <section class="card">
+        <h2>Predicted Role</h2>
+        <p>{{ resume.predicted_role }} <span style="color:#00b894;">({{ resume.pred_confidence }}%)</span></p>
+    </section>
+
+    <section class="card">
+        <h2>Skills</h2>
+        {% for skill in resume.skills %}
+            <span class="skill-pill">{{ skill }}</span>
+        {% endfor %}
+    </section>
+
+    <section class="card">
+        <h2>Experience & Education</h2>
+        <p><strong>Experience:</strong> {{ resume.experience_years }} years</p>
+        <p><strong>Education:</strong> {{ resume.education | join(', ') }}</p>
+    </section>
+
+    <section class="card">
+        <h2>Grammar & Spelling</h2>
+        <p><strong>Grammar Errors:</strong> {{ resume.grammar_errors }}</p>
+        <p><strong>Spelling Errors:</strong> {{ resume.spelling_errors }}</p>
+    </section>
+
+    {% if match_score is not none %}
+    <section class="card">
+        <h2>ATS Match Score</h2>
+        <div style="width:100%; max-width:400px; background:rgba(255,255,255,0.05); border-radius:10px; height:30px; overflow:hidden;">
+            <div style="width:{{ match_score }}%; background:linear-gradient(90deg,#00cec9,#00b894); text-align:right; line-height:30px; color:#fff; padding-right:10px;">
+                {{ match_score }}%
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="card" style="text-align:center;">
+        <a href="{{ url_for('index') }}" class="button-link">Back Home</a>
+        <a href="{{ url_for('dashboard') }}" class="button-link">Dashboard</a>
+        <a href="{{ url_for('analyze_more', candidate_id=candidate_id) }}" class="button-link">Analyze More</a>
+    </section>
+</div>
+</body>
+</html>

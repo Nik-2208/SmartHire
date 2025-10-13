@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart AI Resume Analyzer</title>
+
+<style>
+    body {
+        background-color: #1e1e2f;
+        color: #e6f0f5;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    header h1 {
+        text-align: center;
+        font-size: 2.5em;
+        margin-bottom: 5px;
+    }
+
+    header p {
+        text-align: center;
+        color: #aaf8f8;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover, .card:focus-within {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,206,201,0.4);
+    }
+
+    .card h2 {
+        margin-bottom: 15px;
+        color: #00cec9;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    textarea, input[type="text"], input[type="file"], button {
+        font-size: 1em;
+        color: #e6f0f5;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid #00cec9;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    textarea::placeholder, input::placeholder {
+        color: #aaf8f8;
+    }
+
+    button {
+        background: #00cec9;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    button:hover, button:focus {
+        background: #00b894;
+        outline: none;
+    }
+
+    a.button-link {
+        display: inline-block;
+        padding: 12px 25px;
+        margin: 5px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #fff;
+        background: #00cec9;
+        transition: background 0.2s ease;
+        text-align: center;
+    }
+
+    a.button-link:hover, a.button-link:focus {
+        background: #00b894;
+        outline: none;
+    }
+
+    /* Focus visible for keyboard users */
+    :focus-visible {
+        outline: 2px solid #00cec9;
+        outline-offset: 2px;
+    }
+
+    @media (max-width: 600px) {
+        header h1 {
+            font-size: 2em;
+        }
+        .card {
+            padding: 20px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <h1>Smart AI Resume Analyzer</h1>
+        <p>Upload resumes and match candidates with your Job Description</p>
+    </header>
+
+    <!-- Job Description Form -->
+    <section class="card">
+        <h2>Job Description</h2>
+        <form method="post">
+            <label for="jd_text">Paste your Job Description:</label>
+            <textarea id="jd_text" name="jd_text" rows="6" placeholder="Paste your Job Description here..." required>{{ jd_text if jd_text else '' }}</textarea>
+            <button type="submit">Save JD</button>
+        </form>
+    </section>
+
+    <!-- Resume Upload Form -->
+    <section class="card">
+        <h2>Upload Resume</h2>
+        <form method="post" action="/upload" enctype="multipart/form-data">
+            <label for="desired_role">Desired Job Role:</label>
+            <input id="desired_role" type="text" name="desired_role" placeholder="e.g., Python Developer" required>
+            
+            <label for="resume_file">Select Resume File:</label>
+            <input id="resume_file" type="file" name="resume_file" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg" required>
+            
+            <button type="submit">Analyze Resume</button>
+        </form>
+    </section>
+
+    <!-- Dashboard Link -->
+    <section class="card" style="text-align:center;">
+        <a href="/dashboard" class="button-link" role="button" tabindex="0">View Dashboard</a>
+    </section>
+
+</div>
+
+</body>
+</html>

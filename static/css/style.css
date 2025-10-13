@@ -1,0 +1,242 @@
+/* ---------------- GLOBAL ---------------- */
+:root {
+    --primary: #00cec9;
+    --secondary: #00b894;
+    --bg-dark: #071021;
+    --bg-mid: #0f2a3a;
+    --bg-light: #06121a;
+    --text-light: #e6f0f5;
+    --glow: 0 0 12px rgba(0, 206, 201, 0.8);
+    --neon: 0 0 25px rgba(0, 206, 201, 0.6);
+    --transition: all 0.4s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at top, var(--bg-mid) 0%, var(--bg-dark) 100%);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    perspective: 1000px;
+}
+
+/* Subtle background floating particles */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png');
+    opacity: 0.05;
+    z-index: 0;
+}
+
+/* ---------------- HEADERS ---------------- */
+h1, h2, h3 {
+    color: var(--primary);
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 206, 201, 0.5);
+    animation: glowPulse 3s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 10px rgba(0,206,201,0.4), 0 0 30px rgba(0,206,201,0.2); }
+    50% { text-shadow: 0 0 20px rgba(0,206,201,0.8), 0 0 50px rgba(0,206,201,0.4); }
+}
+
+/* ---------------- FORMS ---------------- */
+form {
+    max-width: 600px;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    transition: var(--transition);
+}
+
+form:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 0 60px rgba(0,206,201,0.2);
+}
+
+/* Inputs */
+input, textarea, select {
+    padding: 10px 14px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-light);
+    font-size: 1em;
+    transition: var(--transition);
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(0,206,201,0.4);
+    transform: scale(1.01);
+}
+
+/* Buttons */
+button {
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0,206,201,0.3);
+}
+
+button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transition: 0.5s;
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+button:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 30px rgba(0,206,201,0.5);
+}
+
+/* ---------------- CARDS ---------------- */
+.card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4), inset 0 0 25px rgba(255,255,255,0.02);
+    margin: 20px 0;
+    transition: var(--transition);
+    transform-style: preserve-3d;
+    perspective: 800px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-6px) rotateX(3deg) rotateY(-2deg);
+    box-shadow: 0 0 40px rgba(0,206,201,0.2);
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 180deg, rgba(0,206,201,0.05), transparent, rgba(255,255,255,0.02));
+    animation: spinLight 8s linear infinite;
+    z-index: 0;
+}
+
+@keyframes spinLight {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ---------------- SKILL PILLS ---------------- */
+.skill-pill {
+    display: inline-block;
+    padding: 8px 14px;
+    margin: 6px 8px 6px 0;
+    border-radius: 999px;
+    background: rgba(0, 206, 201, 0.08);
+    color: #aaf8f8;
+    border: 1px solid rgba(0, 206, 201, 0.3);
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: var(--transition);
+    box-shadow: inset 0 0 10px rgba(0,206,201,0.1);
+}
+
+.skill-pill:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: rgba(0, 206, 201, 0.25);
+    color: white;
+    box-shadow: 0 0 15px rgba(0,206,201,0.5);
+}
+
+/* ---------------- METRICS ---------------- */
+.metric {
+    display: inline-block;
+    margin: 10px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: inset 0 0 10px rgba(0,206,201,0.05);
+    transition: var(--transition);
+}
+
+.metric:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 20px rgba(0,206,201,0.2);
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+.card, .metric, .skill-pill {
+    animation: float 5s ease-in-out infinite;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 768px) {
+    form {
+        padding: 20px;
+    }
+    .card {
+        padding: 16px;
+    }
+    .metric {
+        min-width: 100px;
+    }
+}
+.ats-bar-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 30px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.ats-bar {
+    height: 100%;
+    line-height: 30px;
+    color: #fff;
+    text-align: right;
+    padding-right: 10px;
+    background: linear-gradient(90deg,#00cec9,#00b894);
+    border-radius: 12px 0 0 12px;
+    transition: width 1s ease;
+    font-weight: 600;
+}
+
