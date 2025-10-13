@@ -7,4 +7,5 @@ easyocr
 textblob
 pillow
 PyMuPDF
-doc2txt
+docx2txt
+
