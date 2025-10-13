@@ -2,16 +2,11 @@ import os
 import re
 import io
 import joblib
-import fitz
-import docx2txt
-import easyocr
 import numpy as np
 from datetime import datetime
-from PIL import Image
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for
 from textblob import TextBlob
 from difflib import SequenceMatcher
-import json
 
 # ---------------- Setup ----------------
 app = Flask(__name__)
@@ -20,7 +15,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 candidates = []
 job_description_data = {}
-reader = easyocr.Reader(['en'], gpu=False)
 
 # ---------------- Load Pretrained Model ----------------
 MODEL_PATH = "resume_analyzer.pkl"
@@ -34,15 +28,17 @@ def clean_text(txt):
     txt = re.sub(r'\s+', ' ', txt)
     return txt.strip()
 
+# ---------------- Resume Text Extraction ----------------
 def extract_text_from_pdf(file_bytes):
     try:
+        import fitz
         pdf = fitz.open(stream=file_bytes, filetype="pdf")
         return "".join([page.get_text() for page in pdf])
     except:
         return ""
 
 def extract_text_from_docx(file_bytes):
-    text = ""  # initialize to avoid UnboundLocalError
+    text = ""
     try:
         import tempfile
         from docx import Document
@@ -55,8 +51,6 @@ def extract_text_from_docx(file_bytes):
         print("DOCX extraction error:", e)
     return text
 
-
-
 def extract_text_from_txt(file_bytes):
     try:
         return file_bytes.decode('utf-8')
@@ -65,7 +59,11 @@ def extract_text_from_txt(file_bytes):
 
 def extract_text_from_image(file_bytes):
     try:
+        from PIL import Image
+        import easyocr
         image = Image.open(io.BytesIO(file_bytes)).convert("RGB")
+        reader = easyocr.Reader(['en'], gpu=False)
+        import numpy as np
         img_np = np.array(image)
         result = reader.readtext(img_np, detail=0)
         return " ".join(result)
@@ -80,7 +78,7 @@ def grammar_check(text):
 
 # ---------------- Resume Parsing ----------------
 def extract_skills(text):
-    skills_list = ["python", "java", "c++", "sql", "aws", "docker", "flask", "django", "react", "javascript", "html", "css"]
+    skills_list = ["python","java","c++","sql","aws","docker","flask","django","react","javascript","html","css"]
     text = clean_text(text)
     return [s for s in skills_list if s in text]
 
@@ -109,8 +107,7 @@ def sentiment_analysis(text):
 
 def parse_resume(file):
     data = {}
-    text = ""  # <-- initialize text to avoid UnboundLocalError
-
+    text = ""
     file_bytes = file.read()
     filename = file.filename.lower()
 
@@ -120,12 +117,12 @@ def parse_resume(file):
         text = extract_text_from_docx(file_bytes)
     elif filename.endswith(".txt"):
         text = extract_text_from_txt(file_bytes)
-    elif filename.endswith((".png", ".jpg", ".jpeg")):
+    elif filename.endswith((".png",".jpg",".jpeg")):
         text = extract_text_from_image(file_bytes)
     else:
-        return None  # unsupported file type
+        return None
 
-    data['text'] = text  # safe now, text always exists
+    data['text'] = text
     data['skills'] = extract_skills(text)
     data['experience_years'] = estimate_experience(text)
     data['education'] = extract_education(text)
@@ -146,7 +143,7 @@ def parse_resume(file):
 
     return data
 
-# ---------------- Job Description Parsing ----------------
+# ---------------- Job Description ----------------
 def parse_job_description(jd_text):
     jd_data = {}
     jd_text_clean = clean_text(jd_text)
@@ -155,7 +152,7 @@ def parse_job_description(jd_text):
     jd_data['required_education'] = extract_education(jd_text_clean)
     return jd_data
 
-# ---------------- ATS Score ----------------
+# ---------------- ATS ----------------
 def compute_match_score(resume_data, jd_data, desired_role=None):
     weight_skills = 0.5
     weight_experience = 0.3
@@ -180,8 +177,9 @@ def compute_match_score(resume_data, jd_data, desired_role=None):
     final_score = (skill_score*weight_skills + exp_score*weight_experience +
                    edu_score*weight_education + role_score*weight_role) * 100
     return round(final_score,2)
+
 # ---------------- Routes ----------------
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET","POST"])
 def index():
     global job_description_data
     if request.method == "POST":
@@ -190,31 +188,25 @@ def index():
             job_description_data = parse_job_description(jd_text)
     return render_template("index.html")
 
-
 @app.route("/upload_page")
 def upload_page():
     return render_template("index.html")
-
 
 @app.route("/upload", methods=["POST"])
 def upload_resume():
     global candidates
     desired_role = request.form.get("desired_role")
     file = request.files.get("resume_file")
-
     if file:
-        resume_data = parse_resume(file)  # Always parse the file anew
+        resume_data = parse_resume(file)
         if resume_data:
-            candidate_id = len(candidates) + 1
+            candidate_id = len(candidates)+1
             candidates.append({
-            'id': candidate_id,
-            'resume_data': resume_data,
-            'full_text': resume_data.get('text', '')
-        })
-
-
+                'id': candidate_id,
+                'resume_data': resume_data,
+                'full_text': resume_data.get('text','')
+            })
             match_score = compute_match_score(resume_data, job_description_data, desired_role) if job_description_data else None
-
             return render_template(
                 "result.html",
                 candidate_id=candidate_id,
@@ -222,9 +214,7 @@ def upload_resume():
                 match_score=match_score,
                 desired_role=desired_role
             )
-
     return redirect(url_for("upload_page"))
-
 
 @app.route("/dashboard")
 def dashboard():
@@ -234,12 +224,10 @@ def dashboard():
         candidates_with_scores.append({**c, 'match_score': match_score})
     return render_template("dashboard.html", candidates=candidates_with_scores, jd_data=job_description_data)
 
-
 @app.route("/candidate/<int:candidate_id>")
 def candidate_detail(candidate_id):
-    candidate = next((c for c in candidates if c['id'] == candidate_id), None)
+    candidate = next((c for c in candidates if c['id']==candidate_id), None)
     if candidate:
-        # Re-run parsing/prediction on stored text
         text = candidate['full_text']
         resume_data = candidate['resume_data']
         cleaned = clean_text(text)
@@ -247,9 +235,8 @@ def candidate_detail(candidate_id):
         pred_label = le.inverse_transform([pred_encoded])[0]
         probs = clf.predict_proba([cleaned])[0]
         resume_data['predicted_role'] = pred_label
-        resume_data['pred_confidence'] = round(max(probs)*100, 2)
+        resume_data['pred_confidence'] = round(max(probs)*100,2)
         match_score = compute_match_score(resume_data, job_description_data) if job_description_data else None
-
         return render_template(
             "result.html",
             candidate_id=candidate_id,
@@ -258,12 +245,10 @@ def candidate_detail(candidate_id):
         )
     return redirect(url_for("dashboard"))
 
-
 @app.route("/analyze_more/<int:candidate_id>")
 def analyze_more(candidate_id):
-    candidate = next((c for c in candidates if c['id'] == candidate_id), None)
+    candidate = next((c for c in candidates if c['id']==candidate_id), None)
     if candidate:
-        # Re-run parsing for fresh analysis
         text = candidate['full_text']
         resume_data = {
             'text': text,
@@ -279,9 +264,8 @@ def analyze_more(candidate_id):
         pred_label = le.inverse_transform([pred_encoded])[0]
         probs = clf.predict_proba([cleaned])[0]
         resume_data['predicted_role'] = pred_label
-        resume_data['pred_confidence'] = round(max(probs)*100, 2)
+        resume_data['pred_confidence'] = round(max(probs)*100,2)
         match_score = compute_match_score(resume_data, job_description_data) if job_description_data else None
-
         return render_template(
             "analyze_more.html",
             candidate_id=candidate_id,
@@ -290,7 +274,6 @@ def analyze_more(candidate_id):
             match_score=match_score
         )
     return redirect(url_for("dashboard"))
-
 
 if __name__ == "__main__":
     app.run(debug=True)
